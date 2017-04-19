@@ -1,0 +1,97 @@
+name: dcrs
+version: 0.1.0
+summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+description: |
+  This is my-snap's description. You have a paragraph or two to tell the
+  most important story about your snap. Keep it under 100 words though,
+  we live in tweetspace and your description wants to look good in the snap
+  store.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+parts:
+  dcrs-ui:
+    after:
+      - electrify
+      - ipfs
+      - zeronet
+    source: DCRS-UI
+    plugin: nodejs
+    node-engine: 6.10.2
+    build: |
+      OP="$PWD"
+      cd $SNAPCRAFT_STAGE/../parts/electrify/build/
+      python3 ./command_line.py "$OP" --main-html "$OP/index.html" --export-to linux-x64 --output-dir $OP/output
+      cd $OP
+    install: |
+      mv -v output/build $SNAPCRAFT_PART_INSTALL/dcrs
+#stage deps of dcrs
+  electrify:
+    #source: Electrify
+    source: https://github.com/DCRS/Electrify
+    source-branch: master
+    source-type: git
+    plugin: python
+    python-packages:
+      - pillow
+      - configobj
+      - semantic_version
+      - appdirs
+      - validators
+      - requests
+    python-version: python3
+    prime: #only used for building
+      - -*
+#ipfs
+  ipfs:
+    source: https://github.com/ipfs/go-ipfs.git
+    source-tag: master
+    plugin: nil
+    build-packages: [make, wget]
+    prepare: |
+      mkdir -p ../go/src/github.com/ipfs/go-ipfs
+      cp -R . ../go/src/github.com/ipfs/go-ipfs
+    build: |
+      env GOPATH=$(pwd)/../go make -C ../go/src/github.com/ipfs/go-ipfs install
+    install: |
+      mkdir $SNAPCRAFT_PART_INSTALL/bin
+      mv ../go/bin/ipfs $SNAPCRAFT_PART_INSTALL/bin/
+    after: [go]
+  go:
+    source-tag: go1.7.5
+#zeronet
+  zeronet:
+    after:
+      - zn-source
+    prime:
+      - usr
+      - bin
+      - lib
+      - include
+      - etc
+      - -usr/share/doc
+      - -usr/share/man
+      - -requirements.txt
+      - -.gitignore
+    source: snap/empty
+    plugin: python
+    python-version: python2
+    requirements: $SNAPCRAFT_STAGE/requirements.txt
+  zn-source:
+    source: https://github.com/HelloZeroNet/ZeroNet
+    source-commit: fae5d22e86929583d04e9197f9e1c12dd0b1890a
+    source-type: git
+    prepare: |
+      sed 's/self.plugin_path = "plugins"/self.plugin_path = os.environ["SNAP_USER_COMMON"]+"\/plugins"/g' -i src/Plugin/PluginManager.py
+      python2 -m py_compile $(find -type f -iname "*.py" -print)
+    stage:
+      - src
+      - tools
+      - plugins
+      - zeronet.py
+      - zeronet.pyc
+      - start.py
+      - start.pyc
+      - requirements.txt
+    plugin: dump
