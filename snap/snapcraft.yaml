@@ -13,10 +13,14 @@ confinement: devmode # use 'strict' once you have the right plugs and slots
 apps:
   dcrs:
     command: bin/snapcraft-preload $SNAP/dcrs/linux-x64/build
-    plugs: [network,network-bind,x11,unity7]
+    plugs: [network,network-bind,opengl,x11,unity7]
 
 parts:
   dcrs-ui:
+    stage-packages:
+      - libnss3
+      - fontconfig-config
+      - gnome-themes-standard
     after:
       - electrify
       - ipfs
