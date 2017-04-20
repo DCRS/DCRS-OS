@@ -12,8 +12,17 @@ confinement: devmode # use 'strict' once you have the right plugs and slots
 
 apps:
   dcrs:
-    command: bin/snapcraft-preload $SNAP/dcrs/linux-x64/build
+    command: bin/snapcraft-preload $SNAP/dcrs/build
     plugs: [network,network-bind,opengl,x11,unity7]
+  zeronet:
+    command: bin/zeronet
+    plugs: [network,network-bind]
+  ipfs:
+    command: bin/ipfs
+    plugs: [network,network-bind]
+  busybox:
+    command: sh
+    plugs: [unity7, opengl, network]
 
 parts:
   dcrs-ui:
@@ -27,6 +36,9 @@ parts:
       - zeronet
       - snapcraft-preload #lib fix
       - desktop-gtk2 #desktop stuff
+    organize:
+      dcrs/libnode.so: usr/lib/x86_64-linux-gnu/libnode.so
+      dcrs/libffmpeg.so: usr/lib/x86_64-linux-gnu/libffmpeg.so
     source: DCRS-UI
     plugin: nodejs
     node-engine: 6.10.2
@@ -36,7 +48,7 @@ parts:
       python3 ./command_line.py "$OP" --main-html "$OP/index.html" --export-to linux-x64 --output-dir $OP/output
       cd $OP
     install: |
-      mv -v output/build $SNAPCRAFT_PART_INSTALL/dcrs
+      mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
 #stage deps of dcrs
   electrify:
     #source: Electrify
@@ -75,6 +87,7 @@ parts:
   zeronet:
     after:
       - zn-source
+      - zn-scripts
     prime:
       - usr
       - bin
@@ -88,21 +101,38 @@ parts:
     source: snap/empty
     plugin: python
     python-version: python2
-    requirements: $SNAPCRAFT_STAGE/requirements.txt
+    requirements: $SNAPCRAFT_STAGE/zeronet/requirements.txt
+  zn-scripts:
+    source: snap/zn-scripts
+    prime:
+      - zeronet/*
+      - bin/*
+    plugin: dump
+    prepare: |
+      python2 -m py_compile $(find -type f -iname "*.py" -print)
+      rm -f $SNAPCRAFT_PART_INSTALL/bin
+      mkdir $SNAPCRAFT_PART_INSTALL/bin
+      ln -s ../zeronet/launcher.py $SNAPCRAFT_PART_INSTALL/bin/zeronet
   zn-source:
     source: https://github.com/HelloZeroNet/ZeroNet
     source-commit: fae5d22e86929583d04e9197f9e1c12dd0b1890a
     source-type: git
+    organize:
+      src: zeronet/src
+      tools: zeronet/tools
+      plugins: zeronet/plugins
+      zeronet.py: zeronet/zeronet.py
+      zeronet.pyc: zeronet/zeronet.pyc
+      start.py: zeronet/start.py
+      start.pyc: zeronet/start.pyc
+      requirements.txt: zeronet/requirements.txt
     prepare: |
-      sed 's/self.plugin_path = "plugins"/self.plugin_path = os.environ["SNAP_USER_COMMON"]+"\/plugins"/g' -i src/Plugin/PluginManager.py
+      sed 's/self.plugin_path = "plugins"/self.plugin_path = os.environ["SNAP_USER_COMMON"]+"\/zeronet\/plugins"/g' -i src/Plugin/PluginManager.py
       python2 -m py_compile $(find -type f -iname "*.py" -print)
     stage:
-      - src
-      - tools
-      - plugins
-      - zeronet.py
-      - zeronet.pyc
-      - start.py
-      - start.pyc
-      - requirements.txt
+      - zeronet/*
     plugin: dump
+  busybox:
+    plugin: nil
+    stage-packages:
+      - busybox
