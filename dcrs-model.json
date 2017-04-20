@@ -1,0 +1,11 @@
+{
+  "type": "model",
+  "authority-id": "ID",
+  "brand-id": "ID",
+  "series": "16",
+  "model": "dcrs",
+  "architecture": "amd64",
+  "gadget": "dcrs-core",
+  "kernel": "pc-kernel",
+  "timestamp": "TIMESTAMP"
+}

@@ -3,3 +3,7 @@ parts
 prime
 stage
 *.snap
+*.img
+!pc*.img
+model.json
+dcrs.model

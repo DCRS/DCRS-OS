@@ -1,0 +1,13 @@
+name: dcrsos
+version: 0.1.0
+summary: DCRS OS
+description: |
+  Components like the X11 server required to launch dcrs (WIP)
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+parts:
+  my-part:
+    # See 'snapcraft plugins'
+    plugin: nil
