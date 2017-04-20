@@ -39,7 +39,9 @@ parts:
     organize:
       dcrs/libnode.so: usr/lib/x86_64-linux-gnu/libnode.so
       dcrs/libffmpeg.so: usr/lib/x86_64-linux-gnu/libffmpeg.so
-    source: DCRS-UI
+    source: https://github.com/DCRS/DCRS-UI
+    source-type: git
+    source-branch: master
     plugin: nodejs
     node-engine: 6.10.2
     build: |
@@ -51,7 +53,6 @@ parts:
       mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
 #stage deps of dcrs
   electrify:
-    #source: Electrify
     source: https://github.com/DCRS/Electrify
     source-branch: master
     source-type: git
