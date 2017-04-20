@@ -11,8 +11,8 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 apps:
-  dcrsos:
-    command: bin/snapcraft-preload $SNAP/dcrsos/build
+  dcrs:
+    command: bin/snapcraft-preload $SNAP/dcrs/build
     plugs: [network,network-bind,opengl,x11,unity7]
   zeronet:
     command: bin/zeronet
@@ -41,8 +41,8 @@ parts:
       - snapcraft-preload #lib fix
       - desktop-gtk2 #desktop stuff
     organize:
-      dcrsos/libnode.so: usr/lib/x86_64-linux-gnu/libnode.so
-      dcrsos/libffmpeg.so: usr/lib/x86_64-linux-gnu/libffmpeg.so
+      dcrs/libnode.so: usr/lib/x86_64-linux-gnu/libnode.so
+      dcrs/libffmpeg.so: usr/lib/x86_64-linux-gnu/libffmpeg.so
     source: https://github.com/DCRS/DCRS-UI
     source-type: git
     source-branch: master
@@ -54,7 +54,7 @@ parts:
       python3 ./command_line.py "$OP" --main-html "$OP/index.html" --export-to linux-x64 --output-dir $OP/output
       cd $OP
     install: |
-      mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrsos
+      mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
 #stage deps of dcrs
   electrify:
     source: https://github.com/DCRS/Electrify
