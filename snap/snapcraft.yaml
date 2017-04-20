@@ -8,41 +8,38 @@ description: |
   store.
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict
 
 apps:
   dcrs:
-    command: bin/snapcraft-preload $SNAP/dcrs/build
-    plugs: [network,network-bind,opengl,x11,unity7]
+    command: desktop-launch $SNAP/dcrs.wrapper
+    plugs:
+     - browser-support #like how is THIS a thing?
+     - network
+     - unity7
+     - gsettings
+     # - home
+     # - pulseaudio
+     # - opengl
   zeronet:
     command: bin/zeronet
-    plugs: [network,network-bind]
+    plugs: [network, network-bind]
   ipfs:
     command: bin/ipfs
-    plugs: [network,network-bind]
+    plugs: [network, network-bind]
   busybox:
     command: sh
     plugs: [unity7, opengl, network]
 
 parts:
-  dcrs-ui:
-    stage-packages:
-      - libnss3
-      - fontconfig-config
-      - gnome-themes-standard
-      - libnotify4
-      - libxtst6
-      - libgconf-2-4
-      - libasound2
+  dcrs:
     after:
+      - deps
+      - desktop-integration
+      - launcher
       - electrify
       - ipfs
       - zeronet
-      - snapcraft-preload #lib fix
-      - desktop-gtk2 #desktop stuff
-    organize:
-      dcrs/libnode.so: usr/lib/x86_64-linux-gnu/libnode.so
-      dcrs/libffmpeg.so: usr/lib/x86_64-linux-gnu/libffmpeg.so
     source: https://github.com/DCRS/DCRS-UI
     source-type: git
     source-branch: master
@@ -55,6 +52,27 @@ parts:
       cd $OP
     install: |
       mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
+#deps of dcrs
+  deps:
+    plugin: nil
+    stage-packages:
+      - libgconf-2-4
+      - libnss3
+      - libxss1
+      - fontconfig-config
+
+  desktop-integration:
+    plugin: nil
+    stage-packages:
+      - libappindicator1
+      - libdbusmenu-glib4
+      - libnotify4
+      - libunity9
+
+  launcher:
+    source: snap/scripts
+    plugin: dump
+    after: [desktop-glib-only]
 #stage deps of dcrs
   electrify:
     source: https://github.com/DCRS/Electrify
@@ -74,7 +92,7 @@ parts:
 #ipfs
   ipfs:
     source: https://github.com/ipfs/go-ipfs.git
-    source-tag: master
+    source-tag: v0.4.8
     plugin: nil
     build-packages: [make, wget]
     prepare: |
@@ -120,7 +138,7 @@ parts:
       ln -s ../zeronet/launcher.py $SNAPCRAFT_PART_INSTALL/bin/zeronet
   zn-source:
     source: https://github.com/HelloZeroNet/ZeroNet
-    source-commit: fae5d22e86929583d04e9197f9e1c12dd0b1890a
+    source-tag: v0.5.4
     source-type: git
     organize:
       src: zeronet/src
