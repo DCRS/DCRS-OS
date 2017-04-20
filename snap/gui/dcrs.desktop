@@ -1,0 +1,12 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+[Desktop Entry]
+Type=Application
+Version=0.1.0
+Encoding=UTF-8
+Name=DCRS
+Icon=${SNAP}/dcrs.png
+Exec=dcrs %u
+Terminal=false
+Categories=Office;Finance;
+Comment=DCRS
+Keywords=internet;webos;zeronet;ipfs;bios

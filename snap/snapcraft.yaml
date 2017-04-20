@@ -19,15 +19,13 @@ apps:
      # - home
      # - pulseaudio
      # - opengl
+    desktop: dcrs.desktop
   zeronet:
     command: bin/zeronet
     plugs: [network, network-bind]
   ipfs:
     command: bin/ipfs
     plugs: [network, network-bind]
-  busybox:
-    command: sh
-    plugs: [unity7, opengl, network]
 
 parts:
   dcrs:
@@ -38,6 +36,7 @@ parts:
       - electrify
       - ipfs
       - zeronet
+      - desktop
     source: https://github.com/DCRS/DCRS-UI
     source-type: git
     source-branch: master
@@ -51,6 +50,10 @@ parts:
     install: |
       mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
 #deps of dcrs
+  desktop:
+    source: snap/gui
+    plugin: dump
+
   deps:
     plugin: nil
     stage-packages:
@@ -153,7 +156,3 @@ parts:
     stage:
       - zeronet/*
     plugin: dump
-  busybox:
-    plugin: nil
-    stage-packages:
-      - busybox
