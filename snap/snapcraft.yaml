@@ -30,6 +30,10 @@ parts:
       - libnss3
       - fontconfig-config
       - gnome-themes-standard
+      - libnotify4
+      - libxtst6
+      - libgconf-2-4
+      - libasound2
     after:
       - electrify
       - ipfs
