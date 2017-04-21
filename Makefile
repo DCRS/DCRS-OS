@@ -7,7 +7,7 @@ DATE=$(shell date --rfc-3339=seconds | sed "s/ /T/g")
 KERNEL=$(shell cat flavor/$(FLAVOR) | grep "^KERNEL=" | grep "=[a-z0-9-]*" -o | grep "[a-z0-9-]*" -o)
 CORE=$(shell cat flavor/$(FLAVOR) | grep "^CORE=" | grep "=[a-z0-9-]*" -o | grep "[a-z0-9-]*" -o)
 
-SNAPDIR=$(wildcard snaps/*)
+SNAPDIR=$(wildcard snaps/*-snap)
 SRC=$(SNAPDIR) core/dcrs-core-$(CORE)
 SNAP=$(SNAPDIR:-snap=.snap) core/dcrs-core-$(CORE).snap
 
@@ -28,8 +28,8 @@ dcrs.model:
 
 snap: $(SNAP)
 
-%.snap: %dcrs-core%
-	cd $(@:.snap=) && snapcraft && cp *.snap ../../$@
+core/dcrs-core-%.snap: core/dcrs-core-%
+	snapcraft snap $(@:.snap=) -o $@
 
 %.snap: %-snap
 	cd $(@:.snap=-snap) && snapcraft && cp *.snap ../../$@

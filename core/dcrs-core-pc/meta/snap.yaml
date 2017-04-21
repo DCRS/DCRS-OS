@@ -1,6 +1,6 @@
-name: dcrs-core
+name: dcrs-core-pc
 version: 16.04
-summary: DCRS Core
+summary: DCRS Core for 64bit PCs
 description: |
  DCRS Core autoboot and config
 type: gadget
