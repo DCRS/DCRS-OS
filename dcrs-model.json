@@ -5,7 +5,7 @@
   "series": "16",
   "model": "dcrs",
   "architecture": "amd64",
-  "gadget": "dcrs-core",
-  "kernel": "pc-kernel",
+  "gadget": "dcrs-core-CORE",
+  "kernel": "KERNEL",
   "timestamp": "TIMESTAMP"
 }

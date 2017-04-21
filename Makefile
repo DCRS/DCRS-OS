@@ -1,10 +1,15 @@
-SRC=$(wildcard *-snap) dcrs-snap dcrs-core-metasnap
-SNAP=$(SRC:-snap=.snap) #dcrs-gadget.snap
-
 KEY=default
 CHANNEL=stable
 ID=account_id
+FLAVOR=pc
 DATE=$(shell date --rfc-3339=seconds | sed "s/ /T/g")
+
+KERNEL=$(shell cat flavor/$(FLAVOR) | grep "^KERNEL=" | grep "=[a-z0-9-]*" -o | grep "[a-z0-9-]*" -o)
+CORE=$(shell cat flavor/$(FLAVOR) | grep "^CORE=" | grep "=[a-z0-9-]*" -o | grep "[a-z0-9-]*" -o)
+
+SNAPDIR=$(wildcard snaps/*)
+SRC=$(SNAPDIR) core/dcrs-core-$(CORE)
+SNAP=$(SNAPDIR:-snap=.snap) core/dcrs-core-$(CORE).snap
 
 all: dcrs.img
 
@@ -17,20 +22,20 @@ dcrs.img: snap dcrs.model
 	 dcrs.model
 
 dcrs.model:
-	cat dcrs-model.json | sed "s/ID/$(ID)/g" | sed "s/TIMESTAMP/$(DATE)/g" > model.json
+	cat dcrs-model.json | sed "s/ID/$(ID)/g" | sed "s/TIMESTAMP/$(DATE)/g" | sed "s/CORE/$(CORE)/g" | sed "s/KERNEL/$(KERNEL)/g" > model.json
 	cat model.json | snap sign -k $(KEY) > dcrs.model
+	rm model.json
 
 snap: $(SNAP)
 
-dcrs.snap: dcrs-snap
-	snapcraft
-	mv *.snap dcrs.snap
-
-%.snap: %-metasnap
-	snapcraft snap $(@:.snap=-metasnap) -o $@
+%.snap: %dcrs-core%
+	cd $(@:.snap=) && snapcraft && cp *.snap ../../$@
 
 %.snap: %-snap
-	cd $(@:.snap=-snap) && snapcraft && mv *.snap ../$@ #-o $@
+	cd $(@:.snap=-snap) && snapcraft && cp *.snap ../../$@
 
 clean:
-	rm -f $(SNAP) dcrs.model dcrs.img
+	rm -f $(SNAP) dcrs.model dcrs.img model.json
+
+full-clean: clean
+	$(foreach snapdir,$(SNAPDIR),cd $(snapdir) && snapcraft clean)
