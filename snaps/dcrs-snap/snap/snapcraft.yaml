@@ -33,7 +33,6 @@ parts:
       - deps
       - desktop-integration
       - launcher
-      - electrify
       - ipfs
       - zeronet
       - desktop
@@ -42,13 +41,8 @@ parts:
     source-branch: master
     plugin: nodejs
     node-engine: 6.10.2
-    build: |
-      OP="$PWD"
-      cd $SNAPCRAFT_STAGE/../parts/electrify/build/
-      python3 ./command_line.py "$OP" --main-html "$OP/index.html" --export-to linux-x64 --output-dir $OP/output
-      cd $OP
-    install: |
-      mv -v output/build/* $SNAPCRAFT_PART_INSTALL/dcrs
+    node-packages:
+     - electron
 #deps of dcrs
   desktop:
     source: snap/gui
@@ -74,22 +68,6 @@ parts:
     source: snap/scripts
     plugin: dump
     after: [desktop-glib-only]
-#stage deps of dcrs
-  electrify:
-    source: https://github.com/DCRS/Electrify
-    source-branch: master
-    source-type: git
-    plugin: python
-    python-packages:
-      - pillow
-      - configobj
-      - semantic_version
-      - appdirs
-      - validators
-      - requests
-    python-version: python3
-    prime: #only used for building
-      - -*
 #ipfs
   ipfs:
     source: https://github.com/ipfs/go-ipfs.git

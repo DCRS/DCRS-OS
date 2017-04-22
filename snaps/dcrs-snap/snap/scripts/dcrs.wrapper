@@ -3,5 +3,5 @@
 # Electron won't start without this
 unset XDG_CONFIG_DIRS
 
-cd $SNAP/dcrs
-exec $SNAP/dcrs/build
+cd $SNAP/lib/node_modules/dcrs
+exec $SNAP/bin/npm start
