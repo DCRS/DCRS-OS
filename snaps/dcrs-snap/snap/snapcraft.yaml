@@ -55,6 +55,10 @@ parts:
       - libnss3
       - libxss1
       - fontconfig-config
+      #stuff that seems to be missing in cleanbuild
+      - libx11-xcb1
+      - libxtst6
+      - libasound2
 
   desktop-integration:
     plugin: nil
